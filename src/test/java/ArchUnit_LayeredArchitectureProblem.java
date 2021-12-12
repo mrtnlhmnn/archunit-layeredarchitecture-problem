@@ -22,27 +22,27 @@ public class ArchUnit_LayeredArchitectureProblem {
                 .layer(layerA).definedBy(PKG+".layerA..")
                 .layer(layerB).definedBy(PKG+".layerB..")
                 .layer(layerC).definedBy(PKG+".layerC..")
-                // ignore any dependencies to java..
+                // ignore any dependencies to java.. Not sure if this ignore could be avoided
                 .ignoreDependency(isMyClass, isJavaClass)
-                // no components to B
+                // no components depend from B
                 .whereLayer(layerB).mayNotBeAccessedByAnyLayer()
                 // B --depends--> A
                 .whereLayer(layerB).mayOnlyAccessLayers(layerA)
                 .whereLayer(layerA).mayOnlyBeAccessedByLayers(layerB)
                 // A --depends--> C
                 .whereLayer(layerC).mayOnlyBeAccessedByLayers(layerA)
+             // .whereLayer(layerA).mayOnlyAccessLayers(layerC)  // <== problem here
+                ;
+        layeredArchitecture.check(myClasses);
+
 /*
    Here is our problem:
-   As soon as the following line is commented in, the test fails because of
+   As soon as the last "whereLayer" statement in line 34 is commented in, the test fails because of
        Field <mycomponent.layerB.B.a> has type <mycomponent.layerA.A> in (B.java:0)
 
    But why does an allowed dependency from A->C bring up an error for a dependency from B->A
-   (which is even allowed)?
+   (which is even explicitely allowed)?
  */
-               .whereLayer(layerA).mayOnlyAccessLayers(layerC)
-        ;
-
-        layeredArchitecture.check(myClasses);
     }
 
     DescribedPredicate<JavaClass> isMyClass = new DescribedPredicate<>("is in mycomponent") {
@@ -58,5 +58,4 @@ public class ArchUnit_LayeredArchitectureProblem {
             return input.getPackageName().startsWith("java");
         }
     };
-
 }
