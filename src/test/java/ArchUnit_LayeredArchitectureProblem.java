@@ -24,23 +24,23 @@ public class ArchUnit_LayeredArchitectureProblem {
                 .layer(layerC).definedBy(PKG+".layerC..")
                 // ignore any dependencies to java.. Not sure if this ignore could be avoided
                 .ignoreDependency(isMyClass, isJavaClass)
-                // no components depend from B
-                .whereLayer(layerB).mayNotBeAccessedByAnyLayer()
-                // B --depends--> A
-                .whereLayer(layerB).mayOnlyAccessLayers(layerA)
-                .whereLayer(layerA).mayOnlyBeAccessedByLayers(layerB)
-                // A --depends--> C
-                .whereLayer(layerC).mayOnlyBeAccessedByLayers(layerA)
-             // .whereLayer(layerA).mayOnlyAccessLayers(layerC)  // <== problem here
+                // no access to A
+                .whereLayer(layerA).mayNotBeAccessedByAnyLayer()
+                // A --can access--> B
+                .whereLayer(layerA).mayOnlyAccessLayers(layerB)
+                .whereLayer(layerB).mayOnlyBeAccessedByLayers(layerA)
+                // B --can access--> C
+                .whereLayer(layerC).mayOnlyBeAccessedByLayers(layerB)
+             // .whereLayer(layerB).mayOnlyAccessLayers(layerC)  // <== problem here, comment in to show
                 ;
         layeredArchitecture.check(myClasses);
 
 /*
    Here is our problem:
    As soon as the last "whereLayer" statement in line 34 is commented in, the test fails because of
-       Field <mycomponent.layerB.B.a> has type <mycomponent.layerA.A> in (B.java:0)
+       Field <mycomponent.layerA.A.b> has type <mycomponent.layerB.B> in (A.java:0)
 
-   But why does an allowed dependency from A->C bring up an error for a dependency from B->A
+   But why does an allowed access from B->C bring up an error for an access from A->B
    (which is even explicitely allowed)?
  */
     }

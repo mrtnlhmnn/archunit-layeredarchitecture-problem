@@ -1,9 +1,7 @@
 package mycomponent.layerB;
 
-import mycomponent.layerA.A;
+import mycomponent.layerC.C;
 
 public class B {
-    A a;
+    C c;
 }
-
-
