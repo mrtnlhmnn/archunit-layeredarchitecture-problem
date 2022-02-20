@@ -31,7 +31,7 @@ public class ArchUnit_LayeredArchitectureProblem {
                 .whereLayer(layerB).mayOnlyBeAccessedByLayers(layerA)
                 // B --can access--> C
                 .whereLayer(layerC).mayOnlyBeAccessedByLayers(layerB)
-             // .whereLayer(layerB).mayOnlyAccessLayers(layerC)  // <== problem here, comment in to show
+              .whereLayer(layerB).mayOnlyAccessLayers(layerC)  // <== problem here, comment in to show
                 ;
         layeredArchitecture.check(myClasses);
 
